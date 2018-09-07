@@ -1,16 +1,20 @@
 <template>
 	<div>
-		<input type="text" class="layui-input">
-		<div id="layui-laydate1" class="layui-laydate">
+		<input class="layui-input" @click.stop="show=!show" :value="current | dateFormat" type="text" readonly>
+
+		<div id="layui-laydate1" class="layui-laydate" v-show="show">
 			<div class="layui-laydate-main laydate-main-list-0">
-				<div class="layui-laydate-header">
-					<i class="layui-icon layui-icon-prev laydate-prev-y"></i>
-					<i class="layui-icon layui-icon-left laydate-prev-m"></i>
+				<div class="layui-laydate-header" @click.stop="">
+					<!-- 切换年份 -->
+					<i class="layui-icon layui-icon-prev laydate-prev-y" @click.stop="selectYear=!selectYear"></i>
+					<!-- 切换月份 -->
+					<i class="layui-icon layui-icon-left laydate-prev-m" @click.stop="switchMonth(-1)"></i>
+
 					<div class="laydate-set-ym">
-						<span lay-ym="2018-9" lay-type="year">2018年</span>
-						<span lay-ym="2018-9" lay-type="month">9月</span>
+						<span>{{select.year}}年</span>
+						<span>{{select.month}}月</span>
 					</div>
-					<i class="layui-icon layui-icon-right"></i>
+					<i class="layui-icon layui-icon-right" @click.stop="switchMonth(1)"></i>
 					<i class="layui-icon layui-icon-next laydate-next-y"></i>
 				</div>
 				<div class="layui-laydate-content">
@@ -27,86 +31,245 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td class="laydate-day-prev" lay-ymd="2018-8-26">26</td>
-								<td class="laydate-day-prev" lay-ymd="2018-8-27">27</td>
-								<td class="laydate-day-prev" lay-ymd="2018-8-28">28</td>
-								<td class="laydate-day-prev" lay-ymd="2018-8-29">29</td>
-								<td class="laydate-day-prev" lay-ymd="2018-8-30">30</td>
-								<td class="laydate-day-prev" lay-ymd="2018-8-31">31</td>
-								<td lay-ymd="2018-9-1" class="">1</td>
-							</tr>
-							<tr>
-								<td lay-ymd="2018-9-2" class="">2</td>
-								<td lay-ymd="2018-9-3" class="">3</td>
-								<td lay-ymd="2018-9-4" class="">4</td>
-								<td lay-ymd="2018-9-5" class="">5</td>
-								<td lay-ymd="2018-9-6" class="">6</td>
-								<td class="layui-this" lay-ymd="2018-9-7">7</td>
-								<td lay-ymd="2018-9-8" class="">8</td>
-							</tr>
-							<tr>
-								<td lay-ymd="2018-9-9" class="">9</td>
-								<td lay-ymd="2018-9-10" class="">10</td>
-								<td lay-ymd="2018-9-11" class="">11</td>
-								<td lay-ymd="2018-9-12" class="">12</td>
-								<td lay-ymd="2018-9-13" class="">13</td>
-								<td lay-ymd="2018-9-14" class="">14</td>
-								<td lay-ymd="2018-9-15" class="">15</td>
-							</tr>
-							<tr>
-								<td lay-ymd="2018-9-16" class="">16</td>
-								<td lay-ymd="2018-9-17" class="">17</td>
-								<td lay-ymd="2018-9-18" class="">18</td>
-								<td lay-ymd="2018-9-19" class="">19</td>
-								<td lay-ymd="2018-9-20" class="">20</td>
-								<td lay-ymd="2018-9-21" class="">21</td>
-								<td lay-ymd="2018-9-22" class="">22</td>
-							</tr>
-							<tr>
-								<td lay-ymd="2018-9-23" class="">23</td>
-								<td lay-ymd="2018-9-24" class="">24</td>
-								<td lay-ymd="2018-9-25" class="">25</td>
-								<td lay-ymd="2018-9-26" class="">26</td>
-								<td lay-ymd="2018-9-27" class="">27</td>
-								<td lay-ymd="2018-9-28" class="">28</td>
-								<td lay-ymd="2018-9-29" class="">29</td>
-							</tr>
-							<tr>
-								<td lay-ymd="2018-9-30" class="">30</td>
-								<td class="laydate-day-next" lay-ymd="2018-10-1">1</td>
-								<td class="laydate-day-next" lay-ymd="2018-10-2">2</td>
-								<td class="laydate-day-next" lay-ymd="2018-10-3">3</td>
-								<td class="laydate-day-next" lay-ymd="2018-10-4">4</td>
-								<td class="laydate-day-next" lay-ymd="2018-10-5">5</td>
-								<td class="laydate-day-next" lay-ymd="2018-10-6">6</td>
+							<tr v-for="week of list">
+								<td v-for="weekday of week" @click="pick(weekday)"
+	                                :class="{
+	                                    'flag': weekday.flag, 
+	                                    'layui-this': !weekday.flag && weekday.text == current.date
+	                                         && select.month == current.month && select.year == current.year}">
+	                                {{weekday.text}}
+                            	</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
 			<div class="layui-laydate-footer">
-				<div class="laydate-footer-btns"><span lay-type="clear" class="laydate-btns-clear">清空</span><span lay-type="now" class="laydate-btns-now">现在</span><span lay-type="confirm" class="laydate-btns-confirm">确定</span></div>
+				<div class="laydate-footer-btns">
+					<span lay-type="clear" class="laydate-btns-clear">清空</span>
+					<span lay-type="now" class="laydate-btns-now">现在</span>
+					<span lay-type="confirm" class="laydate-btns-confirm">确定</span>
+				</div>
 			</div>
 		</div>
 	</div>
 
 </template>
-
 <script>
-	export default {
-		name: "lay-date-Picker",
-		data() {
-			return {
-
-			}
-		},
-		mounted() {
-			//初始化layui
-			let that = this;
-			console.log(that);
-		}
-	}
+    export default {
+    	name:"lay-date-Picker",
+        props: {
+            moment: {
+                type: Number,
+                default() {
+                    return new Date().getTime()
+                }
+            }
+        },
+        data() {
+            return {
+                show: false,    // 控制日历面板的显示与隐藏
+                selectYear: false,  // 控制年份的面板的显示和隐藏
+                current: '',    // 已选择的日期时间。yyyy-MM-dd
+                select: {       // 已选择的日期对象
+                    year: '',
+                    month: '',
+                    date: '',
+                    day: ''
+                },
+                currentMonthFirstDay: null, // 当前月的1号属于星期几
+                currentMonthEndDate: null,  // 当前月的最后一天是几号
+                currentMonthEndDay: null,   // 当前月的最后一天属于星期几
+                lastMonthEndDate: null,     // 上个月的最后一天是几号
+                list: [],   // 日历的二维数组
+                years: [],  // 1900-2100
+                months: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
+            }
+        },
+        watch: {
+            select: {
+                handler(newVal) {
+                    let pre
+                    if (newVal.month == 1) {
+                        pre = new Date(newVal.year - 1, 12, 0)
+                    } else {
+                        pre = new Date(newVal.year, newVal.month - 1, 0)
+                    }
+                    this.lastMonthEndDate = pre.getDate()
+                    // 获取日历排表
+                    this.getDateList()    
+                },
+                deep: true
+            },
+            show(newVal) {
+                if (newVal) {
+                    document.addEventListener('click', this.bindEvent)
+                } else {
+                    document.removeEventListener('click', this.bindEvent)
+                }
+            },
+            // 打开年份选择器的时候使当前年份、月份出现在窗口顶部
+            selectYear(newVal) {
+                if (newVal) {
+                    this.$nextTick(() => {
+                        const year = this.$refs.year
+                        const month = this.$refs.month
+                        const y = year.getElementsByClassName('active')[0].innerHTML
+                        const m = month.getElementsByClassName('active')[0].innerHTML
+                        year.scrollTop = (y - 1900) * 30
+                        month.scrollTop = (this.select.month - 1) * 30
+                    })
+                }
+            }
+        },
+        created() {
+            this.transform(this.moment)
+            this.complete()
+            // 获得年份列表： 1900-2100
+            for(let i = 1900; i <= 2100; i++) {
+                this.years.push(i)
+            }
+        },
+        filters: {
+            // 日期格式过滤器
+            dateFormat(val) {
+                 if (!val) {
+                     return ''
+                 }
+                 return `${val.year}-${val.month}-${val.date}`.replace(/\d+/g, (a) => {
+                     return (a.length === 4) ? a : ((a.length === 2) ? a : ('0' + a))
+                 })
+            }
+        },
+        methods: {
+            /**
+            * 将时间转化为具体的 年、月、日、星期
+            **/
+            transform(time) {
+                const date = new Date(time)
+                this.select.year = date.getFullYear()
+                this.select.month = date.getMonth() + 1
+                this.select.date = date.getDate()
+                this.select.day = date.getDay()
+                this.currentMonthFirstDay = 
+                    new Date(this.select.year, this.select.month - 1, 1, 0).getDay()
+                this.currentMonthEndDate = 
+                    new Date(this.select.year, this.select.month, 0).getDate()
+                this.currentMonthEndDay =
+                    new Date(this.select.year, this.select.month, 0).getDay()
+            },
+            /*
+            * 计算出日历列表，二维数组
+            * 第一层为星期，第二层为每星期的第几天
+            */
+            getDateList() {
+                this.list = []
+                // 获取日历第一行的数据（需加上第一个星期中所包含上个月的几天）
+                let temp = this.lastMonthEndDate - (this.currentMonthFirstDay - 1)
+                let list = 
+                    this.numberList(temp, this.lastMonthEndDate, true)
+                    .concat(this.numberList(1, 7 - this.currentMonthFirstDay))
+                this.list.push(list)
+                temp = (7 - this.currentMonthFirstDay) + 1
+                
+                /*
+                * 剩下的行数
+                */
+                // 计算除了第一行剩下的天数
+                const leftDays = this.currentMonthEndDate - (7 - this.currentMonthFirstDay)
+                // 剩下的星期数
+                const lineNumber = Math.ceil(leftDays / 7)
+                // 包含下个月日历的天数
+                const nextDays = 7 - (leftDays % 7)
+                for (let i = 0; i < lineNumber; i++) {
+                    if (i === lineNumber - 1 && nextDays > 0 && nextDays !== 7) {
+                        this.list[lineNumber] = 
+                            this.numberList(temp, this.currentMonthEndDate)
+                            .concat(this.numberList(1, nextDays, true))
+                    } else {
+                        this.list.push(this.numberList(temp, temp + 6))
+                    }
+                    temp = temp + 7
+                }
+            },
+            /*
+            * 获得日历数组
+            * start: 开始日
+            * end: 结束日
+            * flag： boolean值，判断是否属于本月
+            */
+            numberList(start, end, flag) {
+                let list = []
+                for (let i = start; i <= end; i++) {
+                    list.push({
+                        text: i,
+                        flag: !!flag
+                    })
+                }
+                return list
+            },
+            /*
+            * 切换月份， -1为当前月份-1，+1为当前月份+1
+            */
+            switchMonth(n) {
+                let year = this.select.year
+                if (n===-1) {
+                    const pre = this.select.month === 1 ? 12 : this.select.month - 1
+                    if (pre === 12) {
+                        this.transform(new Date(year - 1, pre - 1, this.select.date))
+                    } else {
+                        this.transform(new Date(year, pre - 1, this.select.date))
+                    }
+                } else {
+                    const next = this.select.month === 12 ? 1 : this.select.month + 1
+                    if (next === 1) {
+                        this.transform(new Date(year + 1, next - 1, this.select.date))
+                    } else {
+                        this.transform(new Date(year, next - 1, this.select.date))
+                    }
+                }
+            },
+            pick(day) {
+                if (!!day.flag) {
+                    // 当页日历上可能还会显示部分上个月或者下个月的部分天数，根据标识来做判断
+                    // 并对月份作出相应的处理
+                    if (parseInt(day.text) > 15) {
+                        this.transform(new Date(this.select.year, this.select.month - 2, parseInt(day.text)))
+                    } else {
+                        this.transform(new Date(this.select.year, this.select.month, parseInt(day.text)))
+                    }
+                } else {
+                    this.transform(new Date(this.select.year, this.select.month - 1, parseInt(day.text)))
+                }
+                this.complete()
+            },
+            // 绑定事件：点击关闭日历面板
+            bindEvent() {
+                this.show = false
+                this.selectYear = false
+            },
+            // 选取年
+            pickYear(n) {
+                this.transform(new Date(n, this.select.month - 1, this.select.date))
+                this.complete()
+            },
+            // 选取月
+            pickMonth(n) {
+                this.transform(new Date(this.select.year, n - 1, this.select.date))
+                this.complete()
+            },
+            // 更改选中时间并向父组件派发事件
+            complete() {
+                // 触发父组件的传过来的picked事件。三个参数: 年，月，日
+                this.$emit('picked', this.select.year, this.select.month, this.select.date)
+                this.current = {
+                    year: this.select.year,
+                    month: this.select.month,
+                    date: this.select.date
+                }
+            }
+        }
+    }
 </script>
 
 <style scoped>
@@ -604,5 +767,8 @@
 	.laydate-theme-grid .laydate-month-list>li {
 		height: 71px;
 		line-height: 71px
+	}
+	.flag{
+		color:#d2d2d2!important;
 	}
 </style>

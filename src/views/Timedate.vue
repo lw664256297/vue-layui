@@ -1,7 +1,7 @@
 <template>
     <div>
         <lay-block title="时间与日期的选择"></lay-block>
-  		<lay-date-Picker  placeholder="Select date"></lay-date-Picker>
+  		<lay-date-Picker type="date" placeholder="Select date"></lay-date-Picker>
     </div>
 </template>
 
