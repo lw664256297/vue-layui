@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<input class="layui-input" @click.stop="show=!show" :value="current | dateFormat" type="text" readonly :lay-type="type">
+		<input class="layui-input" @click.stop="show=!show" :value="current | dateFormat" type="text" readonly>
 
 		<div id="layui-laydate1" class="layui-laydate" v-show="show">
 			<div class="layui-laydate-main laydate-main-list-0">
@@ -59,7 +59,7 @@
     export default {
     	name:"lay-date-Picker",
         props: {
-        	type:"",
+        	format: String,
             moment: {
                 type: Number,
                 default() {
@@ -86,6 +86,9 @@
                 years: [],  // 1900-2100
                 months: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
             }
+        },
+        mounted(){
+        	console.log(this.format);
         },
         watch: {
             select: {
