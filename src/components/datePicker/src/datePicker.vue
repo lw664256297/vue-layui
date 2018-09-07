@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<input class="layui-input" @click.stop="show=!show" :value="current | dateFormat" type="text" readonly>
+		<input class="layui-input" @click.stop="show=!show" :value="current | dateFormat" type="text" readonly :lay-type="type">
 
 		<div id="layui-laydate1" class="layui-laydate" v-show="show">
 			<div class="layui-laydate-main laydate-main-list-0">
@@ -59,6 +59,7 @@
     export default {
     	name:"lay-date-Picker",
         props: {
+        	type:"",
             moment: {
                 type: Number,
                 default() {
@@ -102,6 +103,7 @@
                 deep: true
             },
             show(newVal) {
+            	console.log(newVal);
                 if (newVal) {
                     document.addEventListener('click', this.bindEvent)
                 } else {
